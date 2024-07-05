@@ -1,8 +1,7 @@
 from os import system
 import csv
-import random
 import os
-
+import json
 
 
 
@@ -167,8 +166,50 @@ def mostrar_mas_popular(posts):
     
     print(f"El usuario con el post más likeado es {post_mas_popular[1]} con {post_mas_popular[2]} likes.")  
 
+def ordeno_lista(posts):
+    """
+    Ordena la lista de posts 
 
+    Args:
+    posts (list): Lista .
+    Returns:
+    list: Lista de posts ordenada por el nombre de usuario.
+    """
+    n = len(posts)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if posts[j][1] > posts[j+1][1]:
+                posts[j], posts[j+1] = posts[j+1], posts[j]
+    return posts
 # ----------------------------------------------------------------
+def ordenar_y_guardar_json(posts, nombre_archivo_json):
+    """
+    Ordena los datos por nombre de usuario en orden ascendente y los guarda en un archivo JSON.
+
+    Args:
+    posts (list): Lista 
+    nombre_archivo_json (str): Nombre del archivo JSON donde se guardarán los datos ordenados.
+    """
+    # Ordenar la lista de posts por nombre de usuario
+    posts_ordenados = ordeno_lista(posts)
+
+    # Convertir la lista ordenada a formato JSON
+    posts_json = []
+    for post in posts_ordenados:
+        post_dict = {
+            "id": post[0],
+            "users": post[1],
+            "likes": post[2],
+            "dislikes": post[3],
+            "followers": post[4]
+        }
+        posts_json.append(post_dict)
+
+    # Guardar la lista ordenada en un archivo JSON
+    with open(nombre_archivo_json, "w", encoding="UTF-8") as archivo_json:
+        json.dump(posts_json, archivo_json, ensure_ascii=False, indent=4)
+    
+    print(f"Los datos ordenados han sido guardados en {nombre_archivo_json}.")
 
 
 def limpiar_pantalla ():

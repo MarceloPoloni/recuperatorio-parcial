@@ -1,4 +1,5 @@
 from funciones import *
+import json
 
 
 posts= []
@@ -64,7 +65,8 @@ while seguir == "si":
         case "7":
             limpiar_pantalla()
             if not bandera_primer_ingreso and not bandera_segundo_ingreso:
-                pass
+                nombre_archivo = input ("ingrese nombre del archivo json")
+                ordenar_y_guardar_json(posts, nombre_archivo)
             else:
                 print("Primero debe cargar el archivo y asignarle los datos")
                 

@@ -1,5 +1,4 @@
 from os import system
-import csv
 import os
 import json
 
@@ -22,21 +21,28 @@ def get_path_actual(nombre_archivo):
     return os.path.join(ubi, nombre_archivo)
 
 # ----------------------------------------------------------------
-def cargar_archivo_csv(nombre_archivo_data:str):
-    posts = []
-    try:
-        with open (get_path_actual(nombre_archivo_data), "r", encoding="UTF-8") as archivo_csv:
-            contenido = csv.reader(archivo_csv, delimiter=',')
-            next(contenido)
-            for fila in contenido:
-                posts.append(fila)
+def cargar_archivo_csv(nombre_archivo:str):
+    """archivo csv
 
-        if len(posts) > 0:
-            return posts
-    except:
-        return "No se logro cargar el archivo correctamente."
+    Args:
+        nombre_archivo (str): Nombre del archivo
+        
+    """
+    with open(get_path_actual(nombre_archivo), "r", encoding="utf-8") as archivo:
+        lista = []
+        encabezado = archivo.readline().strip("\n").split(",")
+        for linea in archivo.readlines():
+            archivo = {}
+            linea = linea.strip("\n").split(",")
+            id, user, likes, dislikes,followers = linea
+            archivo["id"] = int(id)
+            archivo["user"] = user
+            archivo["likes"] = int(likes)
+            archivo["dislikes"] = int(dislikes)
+            archivo["followers"] = int(followers)
+            lista.append(archivo)
+            return lista
 # ----------------------------------------------------------------
-
 def imprimir_lista (posts):
     """Imprime la lista de posts en un formato tabular.
 
@@ -52,25 +58,24 @@ def imprimir_lista (posts):
     print("                      LISTA DE POSTS")
     print("ID     Nombre            LIKES       DISLIKES    FOLLOWERS")
     print("------------------------------------------------------------------------")
-    for post in posts[0]:
-        print(f"{post[0]}    {post[1]:17}    {post[2]:10}    {post[3]:10}     {post[4]:10}")
-
+    for post in posts:
+        print(f"{post["id"]}    {post["user"]:17}    {post["likes"]:10}    {post["dislikes"]:10}     {post["followers"]:10}")
 # ----------------------------------------------------------------
     
 
 def asignar_numeros(posts) :
     """ asigna los numeros random
     Args:
-        posts (_type_): _description_
+        posts (type): description
 
     Returns:
-        _type_: _description_
+        type: description
     """
     import random
-    for post in posts[0] :
-        post[2] = random.randint(500,3000)
-        post[3] = random.randint(300,3500)
-        post[4] = random.randint(10000,20000)
+    for post in posts :
+        post["likes"] = random.randint(500,3000)
+        post["dislikes"] = random.randint(300,3500)
+        post["followers"] = random.randint(10000,20000)
     return posts
 # ----------------------------------------------------------------
 
@@ -87,38 +92,36 @@ def crear_archivo_csv(posts:list, nombre):
     with open(csv_file, 'w', newline='') as file:
         encabezado = "id,user,likes,dislikes,followers\n"
         file.write(encabezado)
-        writer = csv.writer(file)
         for post in posts:
-            row = f'{post[0]},{post[1]},{post[2]},{post[3]},{post[4]}\n'
+            row = f'{post["id"]},{post["user"]},{post["likes"]},{post["dislikes"]},{post["followers"]}\n'
             file.write(row)
     print(f'{csv_file} fue creado correctamente.')
 
 # ----------------------------------------------------------------
-
 def mejores_posts(posts):
     """filtra y crea archivo de los mejores posts
 
     Args:
-        posts (_type_): lista
+        posts (type): lista
     """
     mejores = []
-    for post in posts[0] :
-        if(post[2] > 2000):
+    for post in posts :
+        if(post["likes"] > 2000):
             mejores.append(post)
 
     if(len(mejores) > 0):
-        crear_archivo_csv(mejores, "mejores" )
+        crear_archivo_csv(mejores, "mejores")
 
 # ----------------------------------------------------------------
 def filtro_haters(posts):
     """ filtra y crea un archivo de los haters
 
     Args:
-        posts (_type_): lista
+        posts (type): lista
     """
     haters = []
-    for post in posts[0] :
-        if(post[3] > post[2]):
+    for post in posts :
+        if(post["dislikes"] > post["likes"]):
             haters.append(post)
 
     if(len(haters) > 0):
@@ -132,15 +135,15 @@ def promedio_followers(posts):
     """promedia followers
 
     Args:
-        posts (_type_): lista
+        posts (type): lista
 
     Returns:
-        _type_: el promedio solo de los followers
+        type: el promedio solo de los followers
     """
     total_followers = 0
-    for post in posts[0]:
-        total_followers += post[4]
-        promedio = total_followers / len(posts[0])
+    for post in posts:
+        total_followers += post["followers"]
+        promedio = total_followers / len(posts)
 
     return promedio
 # ----------------------------------------------------------------
@@ -151,8 +154,7 @@ def mostrar_mas_popular(posts):
     Muestra el nombre del usuario con el post más likeado y el número de likes.
 
     Args:
-    posts (list): Lista de diccionarios donde cada diccionario contiene datos de un post.
-                  Cada diccionario debe tener una clave 'users' y 'likes'.
+    posts (list): Lista de diccionarios 
 
     """
     if not posts:
@@ -197,11 +199,11 @@ def ordenar_y_guardar_json(posts, nombre_archivo_json):
     posts_json = []
     for post in posts_ordenados:
         post_dict = {
-            "id": post[0],
-            "users": post[1],
-            "likes": post[2],
-            "dislikes": post[3],
-            "followers": post[4]
+            "id": post["id"],
+            "users": post["user"],
+            "likes": post["likes"],
+            "dislikes": post["dislikes"],
+            "followers": post["followers"]
         }
         posts_json.append(post_dict)
 
@@ -210,8 +212,9 @@ def ordenar_y_guardar_json(posts, nombre_archivo_json):
         json.dump(posts_json, archivo_json, ensure_ascii=False, indent=4)
     
     print(f"Los datos ordenados han sido guardados en {nombre_archivo_json}.")
-
-
+    
+    
+    
 def limpiar_pantalla ():
     """limpia la pantalla
 

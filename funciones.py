@@ -154,7 +154,8 @@ def mostrar_mas_popular(posts):
     Muestra el nombre del usuario con el post más likeado y el número de likes.
 
     Args:
-    posts (list): Lista de diccionarios 
+    posts (list): Lista de diccionarios donde cada diccionario contiene datos de un post.
+
 
     """
     if not posts:
